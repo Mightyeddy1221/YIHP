@@ -2,26 +2,54 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap');
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --font-playfair: 'Playfair Display', Georgia, serif;
+  --font-inter: 'Inter', system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    @apply font-sans text-slate-800 bg-white antialiased;
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
-}
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  p, li, td, th, blockquote {
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .nav-link {
+    @apply text-sm font-sans font-medium text-slate-700 hover:text-navy-800 transition-colors duration-150;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center gap-2 bg-navy-800 text-white text-sm font-medium px-5 py-2.5 hover:bg-navy-900 transition-colors duration-150;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center gap-2 border border-navy-800 text-navy-800 text-sm font-medium px-5 py-2.5 hover:bg-navy-800 hover:text-white transition-colors duration-150;
+  }
+
+  .section-label {
+    @apply text-xs font-sans font-semibold tracking-widest uppercase text-gold-500;
+  }
+
+  .divider-gold {
+    @apply block w-12 h-0.5 bg-gold-500;
   }
 }
