@@ -33,6 +33,7 @@ export default defineType({
         ]},
       ],
     }),
+    defineField({ name: "seo", title: "SEO & Social Sharing", type: "seo" }),
   ],
   orderings: [{ title: "Date, Newest", name: "dateDesc", by: [{ field: "date", direction: "desc" }] }],
   preview: {

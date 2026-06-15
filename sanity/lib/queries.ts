@@ -93,7 +93,8 @@ export const memosByTopicQuery = groq`
 export const singleArticleQuery = groq`
   *[_type == "article" && slug.current == $slug][0] {
     ${articleFields},
-    body
+    body,
+    seo { metaTitle, metaDescription, noindex, ogImage { asset->, alt } }
   }
 `;
 
@@ -101,7 +102,8 @@ export const singleMemoQuery = groq`
   *[_type == "policyMemo" && slug.current == $slug][0] {
     ${memoFields},
     summary,
-    authors[]->{ name, role, photo { asset-> } }
+    authors[]->{ name, role, photo { asset-> } },
+    seo { metaTitle, metaDescription, noindex, ogImage { asset->, alt } }
   }
 `;
 

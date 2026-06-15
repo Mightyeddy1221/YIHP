@@ -12,9 +12,10 @@ import { SITE_URL, SITE_DESCRIPTION, ogImageUrl } from "@/lib/seo";
 export const revalidate = 60;
 
 function ogImageFor(article: any): string {
-  return article?.heroImage?.asset
-    ? urlFor(article.heroImage).width(1200).height(630).fit("crop").url()
-    : ogImageUrl({ title: article.title, kicker: article?.topics?.[0]?.title || "Research" });
+  // Priority: editor-set social image → article hero image → generated branded card.
+  if (article?.seo?.ogImage?.asset) return urlFor(article.seo.ogImage).width(1200).height(630).fit("crop").url();
+  if (article?.heroImage?.asset) return urlFor(article.heroImage).width(1200).height(630).fit("crop").url();
+  return ogImageUrl({ title: article.title, kicker: article?.topics?.[0]?.title || "Research" });
 }
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
@@ -22,26 +23,28 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   if (!article) return { title: "Article Not Found" };
 
   const url = `${SITE_URL}/articles/${params.slug}`;
-  const description = article.excerpt || SITE_DESCRIPTION;
+  const title = article.seo?.metaTitle || article.title;
+  const description = article.seo?.metaDescription || article.excerpt || SITE_DESCRIPTION;
   const ogImage = ogImageFor(article);
 
   return {
-    title: article.title,
+    title,
     description,
     alternates: { canonical: url },
+    robots: article.seo?.noindex ? { index: false, follow: true } : undefined,
     openGraph: {
       type: "article",
       url,
-      title: article.title,
+      title,
       description,
       publishedTime: article.date || undefined,
       authors: article.author?.name ? [article.author.name] : undefined,
       section: article.topics?.[0]?.title,
-      images: [{ url: ogImage, width: 1200, height: 630, alt: article.title }],
+      images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
     },
     twitter: {
       card: "summary_large_image",
-      title: article.title,
+      title,
       description,
       images: [ogImage],
     },

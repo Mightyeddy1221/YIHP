@@ -6,11 +6,13 @@ import { singleMemoQuery } from "@/sanity/lib/queries";
 import { PortableText } from "@portabletext/react";
 import { notFound } from "next/navigation";
 import JsonLd from "@/components/JsonLd";
+import { urlFor } from "@/sanity/lib/image";
 import { SITE_URL, SITE_DESCRIPTION, ogImageUrl } from "@/lib/seo";
 
 export const revalidate = 60;
 
 function memoDescription(memo: any): string {
+  if (memo?.seo?.metaDescription) return memo.seo.metaDescription;
   // Pull plain text from the first paragraph of the executive summary, if present.
   const firstBlock = Array.isArray(memo?.summary)
     ? memo.summary.find((b: any) => b._type === "block")
@@ -19,31 +21,39 @@ function memoDescription(memo: any): string {
   return text.trim() ? text.trim().slice(0, 200) : SITE_DESCRIPTION;
 }
 
+function memoOgImage(memo: any): string {
+  // Priority: editor-set social image → generated branded card.
+  if (memo?.seo?.ogImage?.asset) return urlFor(memo.seo.ogImage).width(1200).height(630).fit("crop").url();
+  return ogImageUrl({ title: memo.title, kicker: "Policy Memo" });
+}
+
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const memo = await client.fetch(singleMemoQuery, { slug: params.slug });
   if (!memo) return { title: "Memo Not Found" };
 
   const url = `${SITE_URL}/policy-memos/${params.slug}`;
+  const title = memo.seo?.metaTitle || memo.title;
   const description = memoDescription(memo);
-  const ogImage = ogImageUrl({ title: memo.title, kicker: "Policy Memo" });
+  const ogImage = memoOgImage(memo);
 
   return {
-    title: memo.title,
+    title,
     description,
     alternates: { canonical: url },
+    robots: memo.seo?.noindex ? { index: false, follow: true } : undefined,
     openGraph: {
       type: "article",
       url,
-      title: memo.title,
+      title,
       description,
       publishedTime: memo.date || undefined,
       authors: memo.authors?.map((a: any) => a.name).filter(Boolean),
       section: memo.topics?.[0]?.title,
-      images: [{ url: ogImage, width: 1200, height: 630, alt: memo.title }],
+      images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
     },
     twitter: {
       card: "summary_large_image",
-      title: memo.title,
+      title,
       description,
       images: [ogImage],
     },
@@ -59,7 +69,7 @@ export default async function MemoPage({ params }: { params: { slug: string } })
   if (!memo) notFound();
 
   const url = `${SITE_URL}/policy-memos/${params.slug}`;
-  const ogImage = ogImageUrl({ title: memo.title, kicker: "Policy Memo" });
+  const ogImage = memoOgImage(memo);
 
   const memoLd = {
     "@context": "https://schema.org",

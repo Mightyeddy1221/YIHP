@@ -19,6 +19,7 @@ export default defineType({
       of: [{ type: "block" }],
     }),
     defineField({ name: "tags", title: "Tags", type: "array", of: [{ type: "string" }], options: { layout: "tags" } }),
+    defineField({ name: "seo", title: "SEO & Social Sharing", type: "seo" }),
   ],
   orderings: [{ title: "Date, Newest", name: "dateDesc", by: [{ field: "date", direction: "desc" }] }],
   preview: { select: { title: "title", subtitle: "date" } },
