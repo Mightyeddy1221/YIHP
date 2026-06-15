@@ -18,6 +18,24 @@ export default defineType({
       type: "array",
       of: [{ type: "block" }],
     }),
+    defineField({
+      name: "body",
+      title: "Full Memo (Body)",
+      description: "Optional. The full text of the memo, shown on the page below the summary. Use this for longer pieces or multi-author collections; leave blank for summary-plus-PDF memos.",
+      type: "array",
+      of: [
+        { type: "block", styles: [
+          { title: "Normal", value: "normal" },
+          { title: "Heading 2", value: "h2" },
+          { title: "Heading 3", value: "h3" },
+          { title: "Quote", value: "blockquote" },
+        ]},
+        { type: "image", options: { hotspot: true }, fields: [
+          defineField({ name: "alt", title: "Alt Text", type: "string" }),
+          defineField({ name: "caption", title: "Caption", type: "string" }),
+        ]},
+      ],
+    }),
     defineField({ name: "tags", title: "Tags", type: "array", of: [{ type: "string" }], options: { layout: "tags" } }),
     defineField({ name: "seo", title: "SEO & Social Sharing", type: "seo" }),
   ],

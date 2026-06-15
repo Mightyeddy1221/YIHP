@@ -163,6 +163,12 @@ export default async function MemoPage({ params }: { params: { slug: string } })
             </div>
           )}
 
+          {memo.body && memo.body.length > 0 && (
+            <div className="mt-10 prose prose-slate max-w-none prose-headings:font-serif prose-headings:text-navy-900 prose-a:text-navy-700 [&_*]:break-words">
+              <PortableText value={memo.body} />
+            </div>
+          )}
+
           {memo.pdfFile?.asset && (
             <div className="mt-10 p-5 bg-slate-50 border border-slate-200 flex items-center justify-between gap-4">
               <div>

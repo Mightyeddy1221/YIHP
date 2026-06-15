@@ -102,6 +102,7 @@ export const singleMemoQuery = groq`
   *[_type == "policyMemo" && slug.current == $slug][0] {
     ${memoFields},
     summary,
+    body,
     authors[]->{ name, role, photo { asset-> } },
     seo { metaTitle, metaDescription, noindex, ogImage { asset->, alt } }
   }
