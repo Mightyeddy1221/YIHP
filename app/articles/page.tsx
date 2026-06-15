@@ -3,8 +3,20 @@ import { ArrowRight, BookOpen } from "lucide-react";
 import type { Metadata } from "next";
 import { client } from "@/sanity/lib/client";
 import { recentArticlesQuery, allTopicsQuery, allDesksQuery } from "@/sanity/lib/queries";
+import { SITE_URL, ogImageUrl } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Articles" };
+export const metadata: Metadata = {
+  title: "Articles",
+  description: "Long-form health policy analysis from YIHP researchers on mental health, substance abuse, housing, criminal justice, and education.",
+  alternates: { canonical: `${SITE_URL}/articles` },
+  openGraph: {
+    type: "website",
+    url: `${SITE_URL}/articles`,
+    title: "Articles",
+    description: "Long-form health policy analysis from YIHP researchers.",
+    images: [{ url: ogImageUrl({ title: "Articles", kicker: "Youth Institute for Health Policy" }), width: 1200, height: 630 }],
+  },
+};
 export const revalidate = 60;
 
 function formatDate(d: string) {

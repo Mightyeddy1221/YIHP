@@ -1,8 +1,20 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
+import { SITE_URL, ogImageUrl } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "About & Mission" };
+export const metadata: Metadata = {
+  title: "About & Mission",
+  description: "The Youth Institute for Health Policy (YIHP) is a student-led, nonpartisan research organization producing rigorous, accessible health policy analysis advancing health equity.",
+  alternates: { canonical: `${SITE_URL}/about` },
+  openGraph: {
+    type: "website",
+    url: `${SITE_URL}/about`,
+    title: "About & Mission",
+    description: "A student-led, nonpartisan health policy research organization advancing health equity.",
+    images: [{ url: ogImageUrl({ title: "About & Mission", kicker: "Youth Institute for Health Policy" }), width: 1200, height: 630 }],
+  },
+};
 
 const values = [
   {

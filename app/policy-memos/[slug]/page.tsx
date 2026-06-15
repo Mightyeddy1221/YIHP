@@ -5,13 +5,49 @@ import { client } from "@/sanity/lib/client";
 import { singleMemoQuery } from "@/sanity/lib/queries";
 import { PortableText } from "@portabletext/react";
 import { notFound } from "next/navigation";
+import JsonLd from "@/components/JsonLd";
+import { SITE_URL, SITE_DESCRIPTION, ogImageUrl } from "@/lib/seo";
 
 export const revalidate = 60;
+
+function memoDescription(memo: any): string {
+  // Pull plain text from the first paragraph of the executive summary, if present.
+  const firstBlock = Array.isArray(memo?.summary)
+    ? memo.summary.find((b: any) => b._type === "block")
+    : null;
+  const text = firstBlock?.children?.map((c: any) => c.text).join("") || "";
+  return text.trim() ? text.trim().slice(0, 200) : SITE_DESCRIPTION;
+}
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const memo = await client.fetch(singleMemoQuery, { slug: params.slug });
   if (!memo) return { title: "Memo Not Found" };
-  return { title: memo.title };
+
+  const url = `${SITE_URL}/policy-memos/${params.slug}`;
+  const description = memoDescription(memo);
+  const ogImage = ogImageUrl({ title: memo.title, kicker: "Policy Memo" });
+
+  return {
+    title: memo.title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "article",
+      url,
+      title: memo.title,
+      description,
+      publishedTime: memo.date || undefined,
+      authors: memo.authors?.map((a: any) => a.name).filter(Boolean),
+      section: memo.topics?.[0]?.title,
+      images: [{ url: ogImage, width: 1200, height: 630, alt: memo.title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: memo.title,
+      description,
+      images: [ogImage],
+    },
+  };
 }
 
 function formatDate(d: string) {
@@ -22,8 +58,42 @@ export default async function MemoPage({ params }: { params: { slug: string } })
   const memo = await client.fetch(singleMemoQuery, { slug: params.slug });
   if (!memo) notFound();
 
+  const url = `${SITE_URL}/policy-memos/${params.slug}`;
+  const ogImage = ogImageUrl({ title: memo.title, kicker: "Policy Memo" });
+
+  const memoLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "@id": `${url}#memo`,
+    headline: memo.title,
+    description: memoDescription(memo),
+    image: [ogImage],
+    datePublished: memo.date || undefined,
+    dateModified: memo.date || undefined,
+    url,
+    mainEntityOfPage: { "@type": "WebPage", "@id": url },
+    author: memo.authors?.length
+      ? memo.authors.map((a: any) => ({ "@type": "Person", name: a.name, jobTitle: a.role || undefined }))
+      : { "@id": `${SITE_URL}/#organization` },
+    publisher: { "@id": `${SITE_URL}/#organization` },
+    articleSection: memo.topics?.map((t: any) => t.title),
+    keywords: memo.tags?.join(", ") || undefined,
+    isAccessibleForFree: true,
+  };
+
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: "Policy Memos", item: `${SITE_URL}/policy-memos` },
+      { "@type": "ListItem", position: 3, name: memo.title, item: url },
+    ],
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <JsonLd data={[memoLd, breadcrumbLd]} />
       <div className="lg:grid lg:grid-cols-[1fr_280px] lg:gap-12">
         <article>
           <Link href="/policy-memos" className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-navy-800 transition-colors mb-8 cursor-pointer">

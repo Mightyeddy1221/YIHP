@@ -2,16 +2,50 @@ import Link from "next/link";
 import { ArrowLeft, Calendar, User, Building2 } from "lucide-react";
 import type { Metadata } from "next";
 import { client } from "@/sanity/lib/client";
-import { singleArticleQuery, allDesksQuery } from "@/sanity/lib/queries";
+import { singleArticleQuery } from "@/sanity/lib/queries";
+import { urlFor } from "@/sanity/lib/image";
 import { PortableText } from "@portabletext/react";
 import { notFound } from "next/navigation";
+import JsonLd from "@/components/JsonLd";
+import { SITE_URL, SITE_DESCRIPTION, ogImageUrl } from "@/lib/seo";
 
 export const revalidate = 60;
+
+function ogImageFor(article: any): string {
+  return article?.heroImage?.asset
+    ? urlFor(article.heroImage).width(1200).height(630).fit("crop").url()
+    : ogImageUrl({ title: article.title, kicker: article?.topics?.[0]?.title || "Research" });
+}
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const article = await client.fetch(singleArticleQuery, { slug: params.slug });
   if (!article) return { title: "Article Not Found" };
-  return { title: article.title, description: article.excerpt };
+
+  const url = `${SITE_URL}/articles/${params.slug}`;
+  const description = article.excerpt || SITE_DESCRIPTION;
+  const ogImage = ogImageFor(article);
+
+  return {
+    title: article.title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "article",
+      url,
+      title: article.title,
+      description,
+      publishedTime: article.date || undefined,
+      authors: article.author?.name ? [article.author.name] : undefined,
+      section: article.topics?.[0]?.title,
+      images: [{ url: ogImage, width: 1200, height: 630, alt: article.title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: article.title,
+      description,
+      images: [ogImage],
+    },
+  };
 }
 
 function formatDate(d: string) {
@@ -22,8 +56,41 @@ export default async function ArticlePage({ params }: { params: { slug: string }
   const article = await client.fetch(singleArticleQuery, { slug: params.slug });
   if (!article) notFound();
 
+  const url = `${SITE_URL}/articles/${params.slug}`;
+  const ogImage = ogImageFor(article);
+
+  const articleLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "@id": `${url}#article`,
+    headline: article.title,
+    description: article.excerpt || undefined,
+    image: [ogImage],
+    datePublished: article.date || undefined,
+    dateModified: article.date || undefined,
+    url,
+    mainEntityOfPage: { "@type": "WebPage", "@id": url },
+    author: article.author?.name
+      ? { "@type": "Person", name: article.author.name, jobTitle: article.author.role || undefined }
+      : { "@id": `${SITE_URL}/#organization` },
+    publisher: { "@id": `${SITE_URL}/#organization` },
+    articleSection: article.topics?.map((t: any) => t.title),
+    isAccessibleForFree: true,
+  };
+
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: "Articles", item: `${SITE_URL}/articles` },
+      { "@type": "ListItem", position: 3, name: article.title, item: url },
+    ],
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <JsonLd data={[articleLd, breadcrumbLd]} />
       <div className="lg:grid lg:grid-cols-[1fr_300px] lg:gap-12">
         <article>
           <Link href="/articles" className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-navy-800 transition-colors mb-8 cursor-pointer">

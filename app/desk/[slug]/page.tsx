@@ -4,13 +4,32 @@ import type { Metadata } from "next";
 import { client } from "@/sanity/lib/client";
 import { deskBySlugQuery, articlesByDeskQuery, memosByDeskQuery, allDesksQuery } from "@/sanity/lib/queries";
 import { notFound } from "next/navigation";
+import { SITE_URL, ogImageUrl } from "@/lib/seo";
 
 export const revalidate = 60;
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const desk = await client.fetch(deskBySlugQuery, { slug: params.slug });
   if (!desk) return { title: "Desk Not Found" };
-  return { title: `${desk.title} Policy Desk` };
+
+  const url = `${SITE_URL}/desk/${params.slug}`;
+  const title = `${desk.title} Policy Desk`;
+  const description = desk.description || `YIHP's ${desk.title} policy desk — regional health policy research and memos.`;
+  const ogImage = ogImageUrl({ title: desk.title, kicker: "Policy Desk" });
+
+  return {
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "website",
+      url,
+      title,
+      description,
+      images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
+    },
+    twitter: { card: "summary_large_image", title, description, images: [ogImage] },
+  };
 }
 
 function formatDate(d: string) {

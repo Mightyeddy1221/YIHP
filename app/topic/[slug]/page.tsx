@@ -4,13 +4,32 @@ import type { Metadata } from "next";
 import { client } from "@/sanity/lib/client";
 import { topicBySlugQuery, articlesByTopicQuery, memosByTopicQuery, allTopicsQuery } from "@/sanity/lib/queries";
 import { notFound } from "next/navigation";
+import { SITE_URL, ogImageUrl } from "@/lib/seo";
 
 export const revalidate = 60;
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const topic = await client.fetch(topicBySlugQuery, { slug: params.slug });
   if (!topic) return { title: "Topic Not Found" };
-  return { title: topic.title };
+
+  const url = `${SITE_URL}/topic/${params.slug}`;
+  const title = `${topic.title} — Research`;
+  const description = topic.description || `YIHP research and policy memos on ${topic.title}.`;
+  const ogImage = ogImageUrl({ title: topic.title, kicker: "Research Area" });
+
+  return {
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "website",
+      url,
+      title,
+      description,
+      images: [{ url: ogImage, width: 1200, height: 630, alt: topic.title }],
+    },
+    twitter: { card: "summary_large_image", title, description, images: [ogImage] },
+  };
 }
 
 function formatDate(d: string) {

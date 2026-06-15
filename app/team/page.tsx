@@ -5,8 +5,20 @@ import { client } from "@/sanity/lib/client";
 import { allTeamQuery } from "@/sanity/lib/queries";
 import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
+import { SITE_URL, ogImageUrl } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Meet the Team" };
+export const metadata: Metadata = {
+  title: "Meet the Team",
+  description: "Meet the student researchers, writers, and editors behind YIHP's health policy analysis.",
+  alternates: { canonical: `${SITE_URL}/team` },
+  openGraph: {
+    type: "website",
+    url: `${SITE_URL}/team`,
+    title: "Meet the Team",
+    description: "The student researchers, writers, and editors behind YIHP.",
+    images: [{ url: ogImageUrl({ title: "Meet the Team", kicker: "Youth Institute for Health Policy" }), width: 1200, height: 630 }],
+  },
+};
 export const revalidate = 60;
 
 export default async function TeamPage() {

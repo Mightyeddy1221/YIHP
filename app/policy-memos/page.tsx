@@ -3,8 +3,20 @@ import { FileText, ArrowRight, Download } from "lucide-react";
 import type { Metadata } from "next";
 import { client } from "@/sanity/lib/client";
 import { allMemosQuery, allTopicsQuery } from "@/sanity/lib/queries";
+import { SITE_URL, ogImageUrl } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Policy Memos" };
+export const metadata: Metadata = {
+  title: "Policy Memos",
+  description: "Targeted, evidence-based policy memos from YIHP intended to inform legislative and administrative decisions on health policy.",
+  alternates: { canonical: `${SITE_URL}/policy-memos` },
+  openGraph: {
+    type: "website",
+    url: `${SITE_URL}/policy-memos`,
+    title: "Policy Memos",
+    description: "Targeted, evidence-based policy memos from YIHP.",
+    images: [{ url: ogImageUrl({ title: "Policy Memos", kicker: "Youth Institute for Health Policy" }), width: 1200, height: 630 }],
+  },
+};
 export const revalidate = 60;
 
 function formatDate(d: string) {
