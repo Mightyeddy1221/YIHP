@@ -32,6 +32,9 @@ export const metadata: Metadata = {
   creator: SITE_NAME,
   publisher: SITE_NAME,
   alternates: { canonical: "/" },
+  verification: {
+    google: "chA-YMBzlB2f4Pko6YABliuje0u0xiHSwxmbn6TpPF4",
+  },
   openGraph: {
     type: "website",
     siteName: SITE_NAME,
