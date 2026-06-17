@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
 
@@ -72,13 +73,10 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-8 h-8 bg-navy-800 flex items-center justify-center">
-              <span className="text-gold-500 font-serif font-bold text-sm">Y</span>
-            </div>
+            <Image src="/logo.png" alt="YIHP" width={40} height={40} className="w-10 h-10" priority />
             <div className="leading-tight">
-              <div className="font-serif font-bold text-navy-900 text-lg tracking-tight">YIHP</div>
-              <div className="text-xs text-slate-500 font-sans hidden sm:block" style={{ fontSize: "10px", letterSpacing: "0.05em" }}>
-                YOUTH INSTITUTE FOR HEALTH POLICY
+              <div className="font-sans text-slate-600 uppercase" style={{ fontSize: "11px", letterSpacing: "0.08em" }}>
+                Youth Institute for Health Policy
               </div>
             </div>
           </Link>
