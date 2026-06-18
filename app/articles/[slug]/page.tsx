@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowLeft, Calendar, User, Building2 } from "lucide-react";
 import type { Metadata } from "next";
 import { client } from "@/sanity/lib/client";
 import { singleArticleQuery } from "@/sanity/lib/queries";
@@ -6,13 +7,12 @@ import { urlFor } from "@/sanity/lib/image";
 import { PortableText } from "@portabletext/react";
 import { notFound } from "next/navigation";
 import JsonLd from "@/components/JsonLd";
-import SectionNav from "@/components/SectionNav";
-import { proseComponents, extractHeadings, type Heading } from "@/components/prose";
 import { SITE_URL, SITE_DESCRIPTION, ogImageUrl } from "@/lib/seo";
 
 export const revalidate = 60;
 
 function ogImageFor(article: any): string {
+  // Priority: editor-set social image → article hero image → generated branded card.
   if (article?.seo?.ogImage?.asset) return urlFor(article.seo.ogImage).width(1200).height(630).fit("crop").url();
   if (article?.heroImage?.asset) return urlFor(article.heroImage).width(1200).height(630).fit("crop").url();
   return ogImageUrl({ title: article.title, kicker: article?.topics?.[0]?.title || "Research" });
@@ -42,7 +42,12 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       section: article.topics?.[0]?.title,
       images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
     },
-    twitter: { card: "summary_large_image", title, description, images: [ogImage] },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImage],
+    },
   };
 }
 
@@ -56,7 +61,6 @@ export default async function ArticlePage({ params }: { params: { slug: string }
 
   const url = `${SITE_URL}/articles/${params.slug}`;
   const ogImage = ogImageFor(article);
-  const sections: Heading[] = extractHeadings(article.body);
 
   const articleLd = {
     "@context": "https://schema.org",
@@ -88,87 +92,81 @@ export default async function ArticlePage({ params }: { params: { slug: string }
   };
 
   return (
-    <div className="max-w-[84rem] mx-auto px-5 sm:px-8 pt-10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <JsonLd data={[articleLd, breadcrumbLd]} />
+      <div className="lg:grid lg:grid-cols-[1fr_300px] lg:gap-12">
+        <article>
+          <Link href="/articles" className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-navy-800 transition-colors mb-8 cursor-pointer">
+            <ArrowLeft className="w-4 h-4" /> Back to Articles
+          </Link>
 
-      {/* mobile back link */}
-      <Link href="/articles" className="link-rule lg:hidden inline-block mb-8" style={{ borderColor: "var(--rule-2)" }}>
-        &larr; All Articles
-      </Link>
-
-      <div className="grid grid-cols-1 lg:grid-cols-[13rem_minmax(0,44rem)_15rem] lg:justify-between gap-x-10 gap-y-10">
-        {/* ===== LEFT RAIL ===== */}
-        <div className="hidden lg:block">
-          <div className="lg:sticky lg:top-10">
-            <Link href="/articles" className="link-rule inline-block mb-8" style={{ borderColor: "var(--rule-2)" }}>
-              &larr; All Articles
-            </Link>
-            <SectionNav sections={sections} />
+          <div className="flex flex-wrap items-center gap-3 mb-4">
+            {article.topics?.[0] && (
+              <Link href={`/topic/${article.topics[0].slug.current}`} className="text-xs font-semibold text-gold-500 uppercase tracking-wider hover:text-gold-600 cursor-pointer">
+                {article.topics[0].title}
+              </Link>
+            )}
+            {article.desk && (
+              <>
+                <span className="text-slate-300">·</span>
+                <Link href={`/desk/${article.desk.slug.current}`} className="text-xs text-slate-500 hover:text-navy-700 cursor-pointer">
+                  {article.desk.title} Desk
+                </Link>
+              </>
+            )}
           </div>
-        </div>
 
-        {/* ===== MIDDLE — article ===== */}
-        <div className="min-w-0">
-          <header>
-            <div className="flex flex-wrap items-baseline gap-x-3 mb-4">
+          <h1 className="font-serif text-3xl md:text-4xl font-bold text-navy-900 leading-tight text-balance">
+            {article.title}
+          </h1>
+
+          {article.excerpt && (
+            <p className="mt-4 text-lg text-slate-600 leading-relaxed border-l-4 border-gold-500 pl-4">
+              {article.excerpt}
+            </p>
+          )}
+
+          <div className="mt-6 flex flex-wrap gap-4 text-sm text-slate-500 pb-6 border-b border-slate-200">
+            {article.author && <span className="flex items-center gap-1.5"><User className="w-3.5 h-3.5" /> {article.author.name}</span>}
+            {article.date && <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> {formatDate(article.date)}</span>}
+            {article.desk && <span className="flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5" /> {article.desk.title} Desk</span>}
+          </div>
+
+          {article.body && (
+            <div className="mt-8 prose prose-slate max-w-none prose-headings:font-serif prose-headings:text-navy-900 prose-a:text-navy-700 [&_*]:break-words [&_*]:overflow-wrap-anywhere">
+              <PortableText value={article.body} />
+            </div>
+          )}
+        </article>
+
+        <aside className="mt-12 lg:mt-0 space-y-6">
+          {article.author && (
+            <div className="border border-slate-200 p-5">
+              <h3 className="font-serif text-sm font-semibold text-navy-900 mb-3">About the Author</h3>
+              <div className="w-10 h-10 rounded-full bg-navy-100 flex items-center justify-center mb-3">
+                <span className="font-serif text-navy-800 font-bold text-sm">{article.author.name?.[0]}</span>
+              </div>
+              <p className="font-medium text-sm text-navy-900">{article.author.name}</p>
+              {article.author.role && <p className="text-xs text-slate-500 mt-0.5">{article.author.role}</p>}
+            </div>
+          )}
+
+          <div className="border border-slate-200 p-5">
+            <h3 className="font-serif text-sm font-semibold text-navy-900 mb-3">Related</h3>
+            <div className="space-y-3">
               {article.topics?.[0] && (
-                <Link href={`/topic/${article.topics[0].slug.current}`} className="kicker hover:text-[color:var(--ink)]">{article.topics[0].title}</Link>
+                <Link href={`/topic/${article.topics[0].slug.current}`} className="block text-sm text-navy-700 hover:text-gold-500 transition-colors cursor-pointer">
+                  More on {article.topics[0].title} →
+                </Link>
               )}
               {article.desk && (
-                <Link href={`/desk/${article.desk.slug.current}`} className="kicker kicker-ink hover:text-[color:var(--ink)]">{article.desk.title} Desk</Link>
+                <Link href={`/desk/${article.desk.slug.current}`} className="block text-sm text-navy-700 hover:text-gold-500 transition-colors cursor-pointer">
+                  {article.desk.title} Desk →
+                </Link>
               )}
-            </div>
-
-            <h1 className="serif-display text-[2.5rem] sm:text-[3.4rem] leading-[1.02] text-balance">{article.title}</h1>
-
-            {article.excerpt && (
-              <p className="dek mt-6 text-[1.3rem] leading-[1.4]">{article.excerpt}</p>
-            )}
-
-            <div className="mt-7 rule-thick" />
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-1 py-3 sans text-[0.7rem] uppercase tracking-[0.13em] text-[color:var(--ink-2)]">
-              {article.author?.name && <span>By {article.author.name}{article.author.role ? `, ${article.author.role}` : ""}</span>}
-              {article.date && <span className="nums">{formatDate(article.date)}</span>}
-              {article.desk && <span>{article.desk.title} Desk</span>}
-            </div>
-            <div className="rule-hair" />
-          </header>
-
-          <article className="mt-10">
-            {article.body ? (
-              <div className="edition-prose">
-                <PortableText value={article.body} components={proseComponents} />
-              </div>
-            ) : (
-              <p className="dek">The full text of this article is being prepared.</p>
-            )}
-          </article>
-        </div>
-
-        {/* ===== RIGHT RAIL ===== */}
-        <aside className="lg:pt-1">
-          <div className="lg:sticky lg:top-10 space-y-10">
-            {article.author?.name && (
-              <div>
-                <div className="rule-thick mb-1" />
-                <div className="kicker py-3">About the Author</div>
-                <p className="serif-display text-[1.2rem] leading-snug">{article.author.name}</p>
-                {article.author.role && <p className="mt-1 sans text-[0.72rem] uppercase tracking-[0.1em] text-[color:var(--ink-3)]">{article.author.role}</p>}
-              </div>
-            )}
-
-            <div>
-              <div className="rule-hair mb-4" />
-              <div className="kicker mb-3 kicker-ink">Continue Reading</div>
-              <ul className="space-y-2.5">
-                {article.topics?.[0] && (
-                  <li><Link href={`/topic/${article.topics[0].slug.current}`} className="link-ink serif-display text-[1.05rem]">More on {article.topics[0].title} &rarr;</Link></li>
-                )}
-                {article.desk && (
-                  <li><Link href={`/desk/${article.desk.slug.current}`} className="link-ink serif-display text-[1.05rem]">{article.desk.title} Desk &rarr;</Link></li>
-                )}
-                <li><Link href="/policy-memos" className="link-ink serif-display text-[1.05rem]">Policy Memos &rarr;</Link></li>
-              </ul>
+              <Link href="/policy-memos" className="block text-sm text-navy-700 hover:text-gold-500 transition-colors cursor-pointer">
+                Policy Memos →
+              </Link>
             </div>
           </div>
         </aside>

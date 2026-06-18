@@ -29,16 +29,16 @@ const config: Config = {
         },
       },
       fontFamily: {
-        serif: ["var(--font-fraunces)", "Georgia", "serif"],
-        sans:  ["var(--font-archivo)", "system-ui", "sans-serif"],
+        serif: ["var(--font-playfair)", "Playfair Display", "Georgia", "serif"],
+        sans:  ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
       },
       typography: {
         DEFAULT: {
           css: {
             maxWidth: "68ch",
-            color: "#1b1a14",
-            a: { color: "#14283f", textDecoration: "underline" },
-            "h1,h2,h3,h4": { fontFamily: "var(--font-fraunces)", color: "#1b1a14" },
+            color: "#1E293B",
+            a: { color: "#1B3A5C", textDecoration: "underline" },
+            "h1,h2,h3,h4": { fontFamily: "var(--font-playfair)", color: "#112440" },
           },
         },
       },

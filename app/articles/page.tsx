@@ -1,7 +1,8 @@
 import Link from "next/link";
+import { ArrowRight, BookOpen } from "lucide-react";
 import type { Metadata } from "next";
 import { client } from "@/sanity/lib/client";
-import { recentArticlesQuery, allTopicsQuery } from "@/sanity/lib/queries";
+import { recentArticlesQuery, allTopicsQuery, allDesksQuery } from "@/sanity/lib/queries";
 import { SITE_URL, ogImageUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -18,94 +19,92 @@ export const metadata: Metadata = {
 };
 export const revalidate = 60;
 
-function fmt(d?: string) {
-  if (!d) return "";
-  return new Date(d).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+function formatDate(d: string) {
+  return new Date(d).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 }
 
 export default async function ArticlesPage() {
-  const [articles, topics] = await Promise.all([
+  const [articles, topics, desks] = await Promise.all([
     client.fetch(recentArticlesQuery),
     client.fetch(allTopicsQuery),
+    client.fetch(allDesksQuery),
   ]);
 
   return (
-    <div className="max-w-6xl mx-auto px-5 sm:px-8 pt-12">
-      {/* title block */}
-      <header>
-        <div className="kicker mb-3">The Publication</div>
-        <h1 className="serif-display text-[3rem] sm:text-[4rem]">Articles</h1>
-        <p className="dek mt-4 text-[1.2rem] measure-wide">
-          Long-form analysis and original research from our desks — on the policies
-          shaping mental health, housing, substance use, and justice.
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="border-b border-slate-200 pb-8 mb-10">
+        <span className="section-label">YIHP Publication</span>
+        <h1 className="font-serif text-3xl md:text-4xl text-navy-900 mt-3">Articles</h1>
+        <p className="mt-3 text-slate-500 text-sm max-w-2xl leading-relaxed">
+          Policy analysis and original research from YIHP researchers across our policy desks.
         </p>
-      </header>
+      </div>
 
-      {/* filter run */}
-      {topics?.length > 0 && (
-        <div className="mt-8 flex flex-wrap items-baseline gap-x-3 gap-y-2">
-          <span className="kicker">Filter by topic</span>
-          {topics.map((t: any, i: number) => (
-            <span key={t._id} className="flex items-baseline">
-              {i > 0 && <span className="text-[color:var(--rule-2)] mr-3">&middot;</span>}
-              <Link href={`/topic/${t.slug.current}`} className="link-ink sans text-[0.82rem] uppercase tracking-[0.08em] hover:text-[color:var(--brass)]">
-                {t.title}
-              </Link>
-            </span>
+      {/* Filters */}
+      {(topics?.length > 0 || desks?.length > 0) && (
+        <div className="flex flex-wrap gap-2 mb-8">
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider mr-2 self-center">Topics:</span>
+          {topics?.map((t: any) => (
+            <Link key={t._id} href={`/topic/${t.slug.current}`} className="text-xs px-3 py-1.5 border border-slate-200 text-slate-600 hover:border-navy-300 hover:text-navy-800 transition-colors cursor-pointer">
+              {t.title}
+            </Link>
           ))}
         </div>
       )}
 
-      <div className="rule-double mt-8 mb-2" />
-
-      {/* index */}
       {articles?.length === 0 ? (
-        <p className="py-20 text-center dek text-lg">
-          No articles have been published yet. Add the first in the{" "}
-          <Link href="/studio" className="link-rule">Studio</Link>.
-        </p>
+        <div className="py-16 text-center">
+          <p className="text-slate-400 text-sm">No articles published yet.</p>
+          <p className="text-slate-400 text-xs mt-2">Add your first article in the <Link href="/studio" className="underline hover:text-navy-700">Sanity Studio</Link>.</p>
+        </div>
       ) : (
-        <ol>
-          {articles?.map((a: any, i: number) => (
-            <li key={a._id}>
-              <article
-                className="toc-row grid grid-cols-1 md:grid-cols-[4rem_1fr_11rem] gap-x-8 gap-y-2 py-9"
-                style={{ borderTop: i === 0 ? "none" : "1px solid var(--rule)" }}
-              >
-                {/* number */}
-                <div className="serif-display text-[1.6rem] text-[color:var(--brass)] tnums leading-none hidden md:block pt-1">
-                  {String(i + 1).padStart(2, "0")}
+        <div className="divide-y divide-slate-100">
+          {articles?.map((article: any) => (
+            <div key={article._id} className="flex gap-5 py-7">
+              <div className="hidden sm:flex w-10 h-10 bg-navy-50 border border-navy-100 items-center justify-center flex-shrink-0 mt-1">
+                <BookOpen className="w-4 h-4 text-navy-500" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2 mb-2">
+                  {article.topics?.[0] && (
+                    <Link href={`/topic/${article.topics[0].slug.current}`} className="text-xs font-semibold text-gold-500 uppercase tracking-wider hover:text-gold-600 cursor-pointer">
+                      {article.topics[0].title}
+                    </Link>
+                  )}
+                  {article.desk && (
+                    <>
+                      <span className="text-slate-300 text-xs">·</span>
+                      <Link href={`/desk/${article.desk.slug.current}`} className="text-xs text-slate-500 hover:text-navy-700 cursor-pointer">
+                        {article.desk.title} Desk
+                      </Link>
+                    </>
+                  )}
+                  {article.date && (
+                    <>
+                      <span className="text-slate-300 text-xs">·</span>
+                      <span className="text-xs text-slate-400">{formatDate(article.date)}</span>
+                    </>
+                  )}
                 </div>
-
-                {/* main */}
-                <div>
-                  <div className="flex flex-wrap items-baseline gap-x-3 mb-2">
-                    {a.topics?.[0] && (
-                      <Link href={`/topic/${a.topics[0].slug.current}`} className="kicker hover:text-[color:var(--ink)]">{a.topics[0].title}</Link>
-                    )}
-                    {a.desk && (
-                      <Link href={`/desk/${a.desk.slug.current}`} className="kicker kicker-ink hover:text-[color:var(--ink)]">{a.desk.title} Desk</Link>
-                    )}
-                  </div>
-                  <Link href={`/articles/${a.slug.current}`} className="lead-link block">
-                    <h2 className="lead-head serif-display text-[1.9rem] leading-[1.06] text-balance">{a.title}</h2>
+                <Link href={`/articles/${article.slug.current}`} className="group cursor-pointer">
+                  <h2 className="font-serif text-xl text-navy-900 group-hover:text-navy-700 transition-colors leading-snug font-semibold">
+                    {article.title}
+                  </h2>
+                </Link>
+                {article.excerpt && (
+                  <p className="mt-2 text-sm text-slate-600 leading-relaxed line-clamp-2">{article.excerpt}</p>
+                )}
+                <div className="mt-3 flex items-center gap-4">
+                  {article.author && <span className="text-xs text-slate-500">By {article.author.name}</span>}
+                  <Link href={`/articles/${article.slug.current}`} className="text-xs font-medium text-navy-700 hover:text-gold-500 transition-colors flex items-center gap-1 cursor-pointer">
+                    Read article <ArrowRight className="w-3 h-3" />
                   </Link>
-                  {a.excerpt && <p className="mt-3 text-[1.02rem] leading-relaxed measure-wide" style={{ color: "var(--ink-2)", fontFamily: "var(--font-fraunces), serif" }}>{a.excerpt}</p>}
-                  <div className="mt-4 sans text-[0.68rem] uppercase tracking-[0.12em] text-[color:var(--ink-3)]">
-                    {a.author?.name ? `By ${a.author.name}` : "YIHP Staff"}
-                  </div>
                 </div>
-
-                {/* date column */}
-                <div className="md:text-right sans text-[0.7rem] uppercase tracking-[0.12em] text-[color:var(--ink-3)] nums md:pt-1">
-                  {fmt(a.date)}
-                </div>
-              </article>
-            </li>
+              </div>
+            </div>
           ))}
-        </ol>
+        </div>
       )}
-      <div className="rule-hair" />
     </div>
   );
 }

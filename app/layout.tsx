@@ -1,24 +1,22 @@
 import type { Metadata } from "next";
-import { Fraunces, Archivo } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import "./edition.css";
-import Masthead from "@/components/Masthead";
-import Colophon from "@/components/Colophon";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SITE_URL, SITE_NAME, SITE_SHORT, SITE_DESCRIPTION, SITE_KEYWORDS, ORGANIZATION_LD, ogImageUrl } from "@/lib/seo";
 
-const fraunces = Fraunces({
+const inter = Inter({
   subsets: ["latin"],
-  style: ["normal", "italic"],
-  variable: "--font-fraunces",
+  variable: "--font-inter",
   display: "swap",
 });
 
-const archivo = Archivo({
+const playfair = Playfair_Display({
   subsets: ["latin"],
-  variable: "--font-archivo",
+  variable: "--font-playfair",
   display: "swap",
 });
 
@@ -83,12 +81,12 @@ const siteJsonLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${fraunces.variable} ${archivo.variable}`}>
-      <body className="edition edition-bg antialiased min-h-screen flex flex-col">
+    <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
+      <body className="antialiased min-h-screen flex flex-col">
         <JsonLd data={siteJsonLd} />
-        <Masthead />
+        <Navbar />
         <main className="flex-1">{children}</main>
-        <Colophon />
+        <Footer />
         <Analytics />
         <SpeedInsights />
       </body>
