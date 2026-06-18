@@ -52,7 +52,7 @@ export default async function TeamPage() {
                   <span className="section-label">Leadership</span>
                   <span className="divider-gold mt-2 mb-6" />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-14">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-14">
                   {leadership.map((member) => (
                     <MemberCard key={member._id} member={member} large />
                   ))}
@@ -66,7 +66,7 @@ export default async function TeamPage() {
                   <span className="section-label">Researchers &amp; Writers</span>
                   <span className="divider-gold mt-2 mb-6" />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   {rest.map((member) => (
                     <MemberCard key={member._id} member={member} large={false} />
                   ))}
@@ -75,7 +75,7 @@ export default async function TeamPage() {
             )}
 
             {leadership.length === 0 && rest.length === 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {team.map((member) => (
                   <MemberCard key={member._id} member={member} large={false} />
                 ))}
@@ -97,40 +97,43 @@ export default async function TeamPage() {
 }
 
 function MemberCard({ member, large }: { member: any; large: boolean }) {
+  const dim = large ? "w-32 h-32" : "w-24 h-24";
+  const src = large ? 256 : 192;
+  const px = large ? 56 : 48;
   return (
-    <div className={`border border-slate-200 ${large ? "p-6" : "p-5"}`}>
-      <div className={`flex items-${large ? "start" : "center"} gap-${large ? "4" : "3"} mb-${large ? "4" : "3"}`}>
+    <div className={`border border-slate-200 ${large ? "p-8" : "p-7"}`}>
+      <div className="flex items-start gap-6 mb-4">
         {member.photo?.asset ? (
-          <div className={`${large ? "w-14 h-14" : "w-10 h-10"} rounded-full overflow-hidden flex-shrink-0`}>
+          <div className={`${dim} rounded-full overflow-hidden flex-shrink-0`}>
             <Image
-              src={urlFor(member.photo).width(large ? 112 : 80).height(large ? 112 : 80).fit("crop").url()}
+              src={urlFor(member.photo).width(src).height(src).fit("crop").url()}
               alt={member.name}
-              width={large ? 56 : 40}
-              height={large ? 56 : 40}
+              width={px}
+              height={px}
               className="object-cover w-full h-full"
             />
           </div>
         ) : (
-          <div className={`${large ? "w-14 h-14" : "w-10 h-10"} rounded-full ${large ? "bg-navy-800" : "bg-slate-100 border border-slate-200"} flex items-center justify-center flex-shrink-0`}>
-            <span className={`font-serif font-bold ${large ? "text-white text-lg" : "text-navy-700 text-sm"}`}>
+          <div className={`${dim} rounded-full ${large ? "bg-navy-800" : "bg-slate-100 border border-slate-200"} flex items-center justify-center flex-shrink-0`}>
+            <span className={`font-serif font-bold ${large ? "text-white text-4xl" : "text-navy-700 text-3xl"}`}>
               {member.name?.[0]}
             </span>
           </div>
         )}
-        <div>
-          <h3 className={`font-serif ${large ? "text-lg" : "text-base"} font-semibold text-navy-900`}>{member.name}</h3>
-          {member.role && <p className={`${large ? "text-sm text-gold-500 font-medium" : "text-xs text-slate-500"}`}>{member.role}</p>}
+        <div className="pt-1">
+          <h3 className={`font-serif ${large ? "text-2xl" : "text-xl"} font-semibold text-navy-900`}>{member.name}</h3>
+          {member.role && <p className={`mt-1 ${large ? "text-base text-gold-500 font-medium" : "text-sm text-slate-500"}`}>{member.role}</p>}
           {member.desk && (
-            <Link href={`/desk/${member.desk.slug.current}`} className="text-xs text-slate-500 hover:text-navy-700 transition-colors cursor-pointer">
+            <Link href={`/desk/${member.desk.slug.current}`} className="block mt-1 text-sm text-slate-500 hover:text-navy-700 transition-colors cursor-pointer">
               {member.desk.title} Desk
             </Link>
           )}
         </div>
       </div>
-      {member.bio && <p className="text-sm text-slate-600 leading-relaxed">{member.bio}</p>}
+      {member.bio && <p className="text-base text-slate-600 leading-relaxed">{member.bio}</p>}
       {member.linkedin && (
-        <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-navy-700 transition-colors cursor-pointer">
-          <ExternalLink className="w-3.5 h-3.5" /> LinkedIn
+        <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-navy-700 transition-colors cursor-pointer">
+          <ExternalLink className="w-4 h-4" /> LinkedIn
         </a>
       )}
     </div>
