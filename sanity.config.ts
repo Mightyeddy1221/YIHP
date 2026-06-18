@@ -1,6 +1,7 @@
 import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
 import { schemaTypes } from "./sanity/schemaTypes";
+import { GenerateTagsAction } from "./sanity/actions/generateTags";
 
 export default defineConfig({
   basePath: "/studio",
@@ -8,6 +9,10 @@ export default defineConfig({
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET ?? "production",
   title: "YIHP",
   schema: { types: schemaTypes },
+  document: {
+    actions: (prev, context) =>
+      context.schemaType === "policyMemo" ? [...prev, GenerateTagsAction] : prev,
+  },
   plugins: [
     structureTool({
       structure: (S) =>
