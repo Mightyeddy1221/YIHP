@@ -35,10 +35,10 @@ export function extractHeadings(blocks: any): Heading[] {
 export const proseComponents: PortableTextComponents = {
   block: {
     h2: ({ children, value }) => (
-      <h2 id={slugify(blockText(value))} className="scroll-mt-24">{children}</h2>
+      <h2 id={slugify(blockText(value))} className="scroll-mt-28">{children}</h2>
     ),
     h3: ({ children, value }) => (
-      <h3 id={slugify(blockText(value))} className="scroll-mt-24">{children}</h3>
+      <h3 id={slugify(blockText(value))} className="scroll-mt-28">{children}</h3>
     ),
   },
 };

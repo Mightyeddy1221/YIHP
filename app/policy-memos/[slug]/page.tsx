@@ -121,7 +121,7 @@ export default async function MemoPage({ params }: { params: { slug: string } })
       <div className="grid grid-cols-1 lg:grid-cols-[13rem_minmax(0,44rem)_15rem] lg:justify-between gap-x-10 gap-y-10">
         {/* ===== LEFT RAIL — sticky sections nav ===== */}
         <div className="hidden lg:block">
-          <div className="lg:sticky lg:top-8">
+          <div className="lg:sticky lg:top-28">
             <Link href="/policy-memos" className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-navy-800 transition-colors mb-8 cursor-pointer">
               <ArrowLeft className="w-4 h-4" /> Back
             </Link>
@@ -176,7 +176,7 @@ export default async function MemoPage({ params }: { params: { slug: string } })
           )}
 
           {memo.summary && (
-            <div id="summary" className="mt-8 scroll-mt-24">
+            <div id="summary" className="mt-8 scroll-mt-28">
               <h2 className="font-serif text-xl font-semibold text-navy-900 mb-5">Executive Summary</h2>
               <div className="prose prose-slate max-w-none prose-headings:font-serif prose-lg">
                 <PortableText value={memo.summary} components={proseComponents} />
@@ -205,7 +205,7 @@ export default async function MemoPage({ params }: { params: { slug: string } })
 
         {/* ===== RIGHT RAIL — authors + related ===== */}
         <aside>
-          <div className="lg:sticky lg:top-8 space-y-6">
+          <div className="lg:sticky lg:top-28 space-y-6">
             {memo.authors?.length > 0 && (
               <div className="border border-slate-200 p-5">
                 <h3 className="font-serif text-sm font-semibold text-navy-900 mb-4">Authors</h3>
