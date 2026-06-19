@@ -26,13 +26,13 @@ export default async function HomePage() {
     <div>
       {/* Hero */}
       <section className="bg-navy-800 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
-          <div className="max-w-3xl">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-28 md:py-36">
+          <div className="max-w-4xl">
             <span className="section-label text-gold-400">Youth Institute for Health Policy</span>
-            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold text-white mt-4 leading-tight text-balance">
+            <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl font-bold text-white mt-5 leading-tight text-balance">
               Policy Research for a Healthier Future
             </h1>
-            <p className="mt-6 text-lg text-slate-300 leading-relaxed max-w-2xl">
+            <p className="mt-7 text-lg md:text-xl text-slate-300 leading-relaxed max-w-2xl">
               YIHP produces rigorous, accessible policy analysis on mental health, substance abuse, housing, and criminal
               justice — advancing health equity across Massachusetts and beyond.
             </p>

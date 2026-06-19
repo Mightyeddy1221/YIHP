@@ -6,6 +6,8 @@ import { singleMemoQuery } from "@/sanity/lib/queries";
 import { PortableText } from "@portabletext/react";
 import { notFound } from "next/navigation";
 import JsonLd from "@/components/JsonLd";
+import SectionNav from "@/components/SectionNav";
+import { proseComponents, extractHeadings, type Heading } from "@/components/prose";
 import { urlFor } from "@/sanity/lib/image";
 import { SITE_URL, SITE_DESCRIPTION, ogImageUrl } from "@/lib/seo";
 
@@ -71,6 +73,12 @@ export default async function MemoPage({ params }: { params: { slug: string } })
   const url = `${SITE_URL}/policy-memos/${params.slug}`;
   const ogImage = memoOgImage(memo);
 
+  // Sections nav: Summary (if present) + headings pulled from the body.
+  const sections: Heading[] = [
+    ...(memo.summary ? [{ id: "summary", text: "Summary", level: 2 }] : []),
+    ...extractHeadings(memo.body),
+  ];
+
   const memoLd = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -102,14 +110,27 @@ export default async function MemoPage({ params }: { params: { slug: string } })
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div className="max-w-[84rem] mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <JsonLd data={[memoLd, breadcrumbLd]} />
-      <div className="lg:grid lg:grid-cols-[1fr_280px] lg:gap-12">
-        <article>
-          <Link href="/policy-memos" className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-navy-800 transition-colors mb-8 cursor-pointer">
-            <ArrowLeft className="w-4 h-4" /> Back to Policy Memos
-          </Link>
 
+      {/* mobile back link */}
+      <Link href="/policy-memos" className="lg:hidden inline-flex items-center gap-2 text-sm text-slate-500 hover:text-navy-800 transition-colors mb-8 cursor-pointer">
+        <ArrowLeft className="w-4 h-4" /> Back to Policy Memos
+      </Link>
+
+      <div className="grid grid-cols-1 lg:grid-cols-[13rem_minmax(0,44rem)_15rem] lg:justify-between gap-x-10 gap-y-10">
+        {/* ===== LEFT RAIL — sticky sections nav ===== */}
+        <div className="hidden lg:block">
+          <div className="lg:sticky lg:top-8">
+            <Link href="/policy-memos" className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-navy-800 transition-colors mb-8 cursor-pointer">
+              <ArrowLeft className="w-4 h-4" /> Back
+            </Link>
+            <SectionNav sections={sections} />
+          </div>
+        </div>
+
+        {/* ===== MIDDLE — memo ===== */}
+        <article className="min-w-0">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-7 h-7 bg-navy-800 flex items-center justify-center">
               <FileText className="w-3.5 h-3.5 text-white" />
@@ -155,17 +176,17 @@ export default async function MemoPage({ params }: { params: { slug: string } })
           )}
 
           {memo.summary && (
-            <div className="mt-8">
+            <div id="summary" className="mt-8 scroll-mt-24">
               <h2 className="font-serif text-xl font-semibold text-navy-900 mb-5">Executive Summary</h2>
-              <div className="prose prose-slate max-w-none prose-headings:font-serif">
-                <PortableText value={memo.summary} />
+              <div className="prose prose-slate max-w-none prose-headings:font-serif prose-lg">
+                <PortableText value={memo.summary} components={proseComponents} />
               </div>
             </div>
           )}
 
           {memo.body && memo.body.length > 0 && (
-            <div className="mt-10 prose prose-slate max-w-none prose-headings:font-serif prose-headings:text-navy-900 prose-a:text-navy-700 [&_*]:break-words">
-              <PortableText value={memo.body} />
+            <div className="mt-10 prose prose-slate max-w-none prose-lg prose-headings:font-serif prose-headings:text-navy-900 prose-a:text-navy-700 [&_*]:break-words">
+              <PortableText value={memo.body} components={proseComponents} />
             </div>
           )}
 
@@ -182,39 +203,45 @@ export default async function MemoPage({ params }: { params: { slug: string } })
           )}
         </article>
 
-        <aside className="mt-12 lg:mt-14 space-y-6">
-          {memo.authors?.length > 0 && (
-            <div className="border border-slate-200 p-5">
-              <h3 className="font-serif text-sm font-semibold text-navy-900 mb-4">Authors</h3>
-              <div className="space-y-4">
-                {memo.authors.map((author: any) => (
-                  <div key={author.name} className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-navy-100 flex items-center justify-center flex-shrink-0">
-                      <span className="font-serif text-navy-800 font-bold text-xs">{author.name?.[0]}</span>
+        {/* ===== RIGHT RAIL — authors + related ===== */}
+        <aside>
+          <div className="lg:sticky lg:top-8 space-y-6">
+            {memo.authors?.length > 0 && (
+              <div className="border border-slate-200 p-5">
+                <h3 className="font-serif text-sm font-semibold text-navy-900 mb-4">Authors</h3>
+                <div className="space-y-4">
+                  {memo.authors.map((author: any) => (
+                    <div key={author.name} className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-navy-100 flex items-center justify-center flex-shrink-0">
+                        <span className="font-serif text-navy-800 font-bold text-xs">{author.name?.[0]}</span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-navy-900">{author.name}</p>
+                        {author.role && <p className="text-xs text-slate-500">{author.role}</p>}
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-navy-900">{author.name}</p>
-                      {author.role && <p className="text-xs text-slate-500">{author.role}</p>}
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          <div className="border border-slate-200 p-5">
-            <h3 className="font-serif text-sm font-semibold text-navy-900 mb-3">Related</h3>
-            <div className="space-y-2">
-              {memo.topics?.[0] && (
-                <Link href={`/topic/${memo.topics[0].slug.current}`} className="block text-sm text-navy-700 hover:text-gold-500 transition-colors cursor-pointer">
-                  More on {memo.topics[0].title} →
+            <div className="border border-slate-200 p-5">
+              <h3 className="font-serif text-sm font-semibold text-navy-900 mb-3">Related</h3>
+              <div className="space-y-2">
+                {memo.topics?.[0] && (
+                  <Link href={`/topic/${memo.topics[0].slug.current}`} className="block text-sm text-navy-700 hover:text-gold-500 transition-colors cursor-pointer">
+                    More on {memo.topics[0].title} →
+                  </Link>
+                )}
+                {memo.desk && (
+                  <Link href={`/desk/${memo.desk.slug.current}`} className="block text-sm text-navy-700 hover:text-gold-500 transition-colors cursor-pointer">
+                    {memo.desk.title} Desk →
+                  </Link>
+                )}
+                <Link href="/articles" className="block text-sm text-navy-700 hover:text-gold-500 transition-colors cursor-pointer">
+                  All Articles →
                 </Link>
-              )}
-              {memo.desk && (
-                <Link href={`/desk/${memo.desk.slug.current}`} className="block text-sm text-navy-700 hover:text-gold-500 transition-colors cursor-pointer">
-                  {memo.desk.title} Desk →
-                </Link>
-              )}
+              </div>
             </div>
           </div>
         </aside>

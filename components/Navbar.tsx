@@ -73,7 +73,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
-            <Image src="/logo.png" alt="YIHP" width={40} height={40} className="w-10 h-10" priority />
+            <Image src="/logo.png" alt="YIHP" width={56} height={56} className="w-12 h-12 sm:w-14 sm:h-14" priority />
             <div className="leading-tight">
               <div className="font-sans text-slate-600 uppercase" style={{ fontSize: "11px", letterSpacing: "0.08em" }}>
                 Youth Institute for Health Policy
