@@ -94,6 +94,7 @@ export const singleArticleQuery = groq`
   *[_type == "article" && slug.current == $slug][0] {
     ${articleFields},
     body,
+    videoUrl,
     seo { metaTitle, metaDescription, noindex, ogImage { asset->, alt } }
   }
 `;
@@ -103,6 +104,7 @@ export const singleMemoQuery = groq`
     ${memoFields},
     summary,
     body,
+    videoUrl,
     authors[]->{ name, role, photo { asset-> } },
     seo { metaTitle, metaDescription, noindex, ogImage { asset->, alt } }
   }

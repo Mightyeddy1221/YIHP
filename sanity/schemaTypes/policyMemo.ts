@@ -13,6 +13,12 @@ export default defineType({
     defineField({ name: "topics", title: "Topics", type: "array", of: [{ type: "reference", to: [{ type: "topicArea" }] }] }),
     defineField({ name: "pdfFile", title: "PDF File", type: "file", options: { accept: ".pdf" } }),
     defineField({
+      name: "videoUrl",
+      title: "Video (YouTube link)",
+      type: "url",
+      description: "Paste a YouTube link (unlisted recommended). It plays directly on the memo page in a custom YIHP-styled player — visitors never see YouTube's interface or leave the site.",
+    }),
+    defineField({
       name: "summary",
       title: "Executive Summary",
       type: "array",

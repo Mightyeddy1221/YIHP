@@ -7,6 +7,7 @@ import { urlFor } from "@/sanity/lib/image";
 import { PortableText } from "@portabletext/react";
 import { notFound } from "next/navigation";
 import JsonLd from "@/components/JsonLd";
+import VideoPlayer from "@/components/VideoPlayer";
 import { SITE_URL, SITE_DESCRIPTION, ogImageUrl } from "@/lib/seo";
 
 export const revalidate = 60;
@@ -131,6 +132,12 @@ export default async function ArticlePage({ params }: { params: { slug: string }
             {article.date && <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> {formatDate(article.date)}</span>}
             {article.desk && <span className="flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5" /> {article.desk.title} Desk</span>}
           </div>
+
+          {article.videoUrl && (
+            <div className="mt-8">
+              <VideoPlayer url={article.videoUrl} title={article.title} />
+            </div>
+          )}
 
           {article.body && (
             <div className="mt-8 prose prose-slate max-w-none prose-headings:font-serif prose-headings:text-navy-900 prose-a:text-navy-700 [&_*]:break-words [&_*]:overflow-wrap-anywhere">

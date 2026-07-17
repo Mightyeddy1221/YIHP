@@ -6,6 +6,7 @@ import { singleMemoQuery } from "@/sanity/lib/queries";
 import { PortableText } from "@portabletext/react";
 import { notFound } from "next/navigation";
 import JsonLd from "@/components/JsonLd";
+import VideoPlayer from "@/components/VideoPlayer";
 import SectionNav from "@/components/SectionNav";
 import { proseComponents, extractHeadings, type Heading } from "@/components/prose";
 import { urlFor } from "@/sanity/lib/image";
@@ -172,6 +173,12 @@ export default async function MemoPage({ params }: { params: { slug: string } })
               {memo.tags.map((tag: string) => (
                 <span key={tag} className="text-xs bg-slate-100 text-slate-600 px-2.5 py-1">{tag}</span>
               ))}
+            </div>
+          )}
+
+          {memo.videoUrl && (
+            <div className="mt-6">
+              <VideoPlayer url={memo.videoUrl} title={memo.title} />
             </div>
           )}
 
