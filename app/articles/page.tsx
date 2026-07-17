@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, BookOpen } from "lucide-react";
+import InlineVideo from "@/components/InlineVideo";
 import type { Metadata } from "next";
 import { client } from "@/sanity/lib/client";
 import { recentArticlesQuery, allTopicsQuery, allDesksQuery } from "@/sanity/lib/queries";
@@ -60,10 +61,16 @@ export default async function ArticlesPage() {
       ) : (
         <div className="divide-y divide-slate-100">
           {articles?.map((article: any) => (
-            <div key={article._id} className="flex gap-5 py-7">
-              <div className="hidden sm:flex w-10 h-10 bg-navy-50 border border-navy-100 items-center justify-center flex-shrink-0 mt-1">
-                <BookOpen className="w-4 h-4 text-navy-500" />
-              </div>
+            <div key={article._id} className="flex flex-col sm:flex-row gap-5 py-7">
+              {article.videoUrl ? (
+                <div className="w-full sm:w-72 flex-shrink-0 sm:mt-1">
+                  <InlineVideo url={article.videoUrl} title={article.title} />
+                </div>
+              ) : (
+                <div className="hidden sm:flex w-10 h-10 bg-navy-50 border border-navy-100 items-center justify-center flex-shrink-0 mt-1">
+                  <BookOpen className="w-4 h-4 text-navy-500" />
+                </div>
+              )}
               <div className="flex-1 min-w-0">
                 <div className="flex flex-wrap items-center gap-2 mb-2">
                   {article.topics?.[0] && (

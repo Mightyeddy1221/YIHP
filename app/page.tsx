@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, FileText, BookOpen } from "lucide-react";
+import InlineVideo from "@/components/InlineVideo";
 import { client } from "@/sanity/lib/client";
 import { featuredArticlesQuery, recentArticlesQuery, recentMemosQuery, allTopicsQuery, allDesksQuery } from "@/sanity/lib/queries";
 
@@ -66,8 +67,9 @@ export default async function HomePage() {
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {featuredArticles.map((article: any) => (
-                <Link key={article._id} href={`/articles/${article.slug.current}`} className="group cursor-pointer">
-                  <article className="border border-slate-200 p-6 hover:border-navy-300 transition-colors duration-200 h-full">
+                <article key={article._id} className="border border-slate-200 hover:border-navy-300 transition-colors duration-200 h-full flex flex-col">
+                  {article.videoUrl && <InlineVideo url={article.videoUrl} title={article.title} />}
+                  <Link href={`/articles/${article.slug.current}`} className="group cursor-pointer block p-6 flex-1">
                     <div className="flex items-center gap-3 mb-3">
                       {article.topics?.[0] && (
                         <span className="text-xs font-semibold text-gold-500 uppercase tracking-wider">{article.topics[0].title}</span>
@@ -91,8 +93,8 @@ export default async function HomePage() {
                         Read more <ArrowRight className="w-3 h-3" />
                       </span>
                     </div>
-                  </article>
-                </Link>
+                  </Link>
+                </article>
               ))}
             </div>
 

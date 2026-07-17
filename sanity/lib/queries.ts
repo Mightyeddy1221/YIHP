@@ -1,7 +1,7 @@
 import { groq } from "next-sanity";
 
 export const articleFields = groq`
-  _id, title, slug, excerpt, date, featured,
+  _id, title, slug, excerpt, date, featured, videoUrl,
   heroImage { asset->, alt },
   author->{ name, role, photo { asset-> } },
   desk->{ title, slug },

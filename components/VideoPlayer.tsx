@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Plyr from "plyr";
+import type Plyr from "plyr";
 import "plyr/dist/plyr.css";
 
 function extractYouTubeId(url: string): string | null {
@@ -11,24 +11,33 @@ function extractYouTubeId(url: string): string | null {
   return match?.[1] ?? null;
 }
 
-export default function VideoPlayer({ url, title }: { url: string; title?: string }) {
+export default function VideoPlayer({ url, title, autoplay = false }: { url: string; title?: string; autoplay?: boolean }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<Plyr | null>(null);
   const id = extractYouTubeId(url);
 
   useEffect(() => {
-    if (!id || !containerRef.current) return;
+    if (!id) return;
+    let cancelled = false;
 
-    playerRef.current = new Plyr(containerRef.current, {
-      controls: ["play-large", "play", "progress", "current-time", "mute", "volume", "fullscreen"],
-      youtube: { noCookie: true, rel: 0, iv_load_policy: 3, modestbranding: 1 },
-    });
+    // Plyr touches `document` at import time, so it must load in the browser only —
+    // a top-level import breaks static prerendering of pages that use this component.
+    (async () => {
+      const { default: PlyrLib } = await import("plyr");
+      if (cancelled || !containerRef.current) return;
+      playerRef.current = new PlyrLib(containerRef.current, {
+        autoplay,
+        controls: ["play-large", "play", "progress", "current-time", "mute", "volume", "fullscreen"],
+        youtube: { noCookie: true, rel: 0, iv_load_policy: 3, modestbranding: 1 },
+      });
+    })();
 
     return () => {
+      cancelled = true;
       playerRef.current?.destroy();
       playerRef.current = null;
     };
-  }, [id]);
+  }, [id, autoplay]);
 
   if (!id) return null;
 
