@@ -98,8 +98,8 @@ export default async function TeamPage() {
 
 function MemberCard({ member, large }: { member: any; large: boolean }) {
   const dim = large ? "w-32 h-32" : "w-24 h-24";
-  const src = large ? 256 : 192;
-  const px = large ? 56 : 48;
+  const px = large ? 128 : 96;          // rendered display size (matches w-32 / w-24)
+  const src = large ? 384 : 288;        // request ~3x from Sanity so retina stays crisp
   return (
     <div className={`border border-slate-200 ${large ? "p-8" : "p-7"}`}>
       <div className="flex items-start gap-6 mb-4">
@@ -110,6 +110,7 @@ function MemberCard({ member, large }: { member: any; large: boolean }) {
               alt={member.name}
               width={px}
               height={px}
+              quality={90}
               className="object-cover w-full h-full"
             />
           </div>
