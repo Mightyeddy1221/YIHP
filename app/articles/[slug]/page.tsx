@@ -101,6 +101,12 @@ export default async function ArticlePage({ params }: { params: { slug: string }
             <ArrowLeft className="w-4 h-4" /> Back to Articles
           </Link>
 
+          {article.videoUrl && (
+            <div className="mb-8">
+              <VideoPlayer url={article.videoUrl} title={article.title} />
+            </div>
+          )}
+
           <div className="flex flex-wrap items-center gap-3 mb-4">
             {article.topics?.[0] && (
               <Link href={`/topic/${article.topics[0].slug.current}`} className="text-xs font-semibold text-gold-500 uppercase tracking-wider hover:text-gold-600 cursor-pointer">
@@ -132,12 +138,6 @@ export default async function ArticlePage({ params }: { params: { slug: string }
             {article.date && <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> {formatDate(article.date)}</span>}
             {article.desk && <span className="flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5" /> {article.desk.title} Desk</span>}
           </div>
-
-          {article.videoUrl && (
-            <div className="mt-8">
-              <VideoPlayer url={article.videoUrl} title={article.title} />
-            </div>
-          )}
 
           {article.body && (
             <div className="mt-8 prose prose-slate max-w-none prose-headings:font-serif prose-headings:text-navy-900 prose-a:text-navy-700 [&_*]:break-words [&_*]:overflow-wrap-anywhere">
