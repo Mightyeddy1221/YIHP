@@ -7,12 +7,6 @@
 :root {
   --font-playfair: 'Playfair Display', Georgia, serif;
   --font-inter: 'Inter', system-ui, sans-serif;
-
-  /* Plyr video player — brand it navy/gold instead of the default cyan */
-  --plyr-color-main: #1B3A5C;
-  --plyr-video-control-color: #ffffff;
-  --plyr-video-control-color-hover: #ffffff;
-  --plyr-video-control-background-hover: #C8952A;
 }
 
 @layer base {
