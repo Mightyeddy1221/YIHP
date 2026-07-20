@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, Calendar, User, Building2 } from "lucide-react";
+import { ArrowLeft, Calendar, User, Building2, FileText } from "lucide-react";
 import type { Metadata } from "next";
 import { client } from "@/sanity/lib/client";
 import { singleArticleQuery } from "@/sanity/lib/queries";
@@ -137,6 +137,16 @@ export default async function ArticlePage({ params }: { params: { slug: string }
             {article.author && <span className="flex items-center gap-1.5"><User className="w-3.5 h-3.5" /> {article.author.name}</span>}
             {article.date && <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> {formatDate(article.date)}</span>}
             {article.desk && <span className="flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5" /> {article.desk.title} Desk</span>}
+            {article.transcriptUrl && (
+              <a
+                href={article.transcriptUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-navy-700 hover:text-gold-500 transition-colors cursor-pointer"
+              >
+                <FileText className="w-3.5 h-3.5" /> Read the Transcript
+              </a>
+            )}
           </div>
 
           {article.body && (

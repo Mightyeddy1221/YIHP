@@ -95,6 +95,7 @@ export const singleArticleQuery = groq`
     ${articleFields},
     body,
     videoUrl,
+    transcriptUrl,
     seo { metaTitle, metaDescription, noindex, ogImage { asset->, alt } }
   }
 `;
