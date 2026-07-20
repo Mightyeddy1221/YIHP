@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       title,
       description,
       publishedTime: article.date || undefined,
-      authors: article.author?.name ? [article.author.name] : undefined,
+      authors: article.authors?.map((a: any) => a.name).filter(Boolean),
       section: article.topics?.[0]?.title,
       images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
     },
@@ -79,8 +79,8 @@ export default async function ArticlePage({ params }: { params: { slug: string }
     dateModified: article.date || undefined,
     url,
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
-    author: article.author?.name
-      ? { "@type": "Person", name: article.author.name, jobTitle: article.author.role || undefined }
+    author: article.authors?.length
+      ? article.authors.map((a: any) => ({ "@type": "Person", name: a.name, jobTitle: a.role || undefined }))
       : { "@id": `${SITE_URL}/#organization` },
     publisher: { "@id": `${SITE_URL}/#organization` },
     articleSection: article.topics?.map((t: any) => t.title),
@@ -152,7 +152,11 @@ export default async function ArticlePage({ params }: { params: { slug: string }
           )}
 
           <div className="mt-6 flex flex-wrap gap-4 text-sm text-slate-500 pb-6 border-b border-slate-200">
-            {article.author && <span className="flex items-center gap-1.5"><User className="w-3.5 h-3.5" /> {article.author.name}</span>}
+            {article.authors?.length > 0 && (
+              <span className="flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5" /> {article.authors.map((a: any) => a.name).join(", ")}
+              </span>
+            )}
             {article.date && <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> {formatDate(article.date)}</span>}
             {article.desk && <span className="flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5" /> {article.desk.title} Desk</span>}
             {article.transcriptUrl && (
@@ -177,14 +181,24 @@ export default async function ArticlePage({ params }: { params: { slug: string }
         {/* ===== RIGHT RAIL — author + related ===== */}
         <aside>
           <div className="lg:sticky lg:top-28 space-y-6">
-            {article.author && (
+            {article.authors?.length > 0 && (
               <div className="border border-slate-200 p-5">
-                <h3 className="font-serif text-sm font-semibold text-navy-900 mb-3">About the Author</h3>
-                <div className="w-10 h-10 rounded-full bg-navy-100 flex items-center justify-center mb-3">
-                  <span className="font-serif text-navy-800 font-bold text-sm">{article.author.name?.[0]}</span>
+                <h3 className="font-serif text-sm font-semibold text-navy-900 mb-4">
+                  {article.authors.length > 1 ? "Authors" : "About the Author"}
+                </h3>
+                <div className="space-y-4">
+                  {article.authors.map((author: any) => (
+                    <div key={author.name} className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-navy-100 flex items-center justify-center flex-shrink-0">
+                        <span className="font-serif text-navy-800 font-bold text-xs">{author.name?.[0]}</span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-navy-900">{author.name}</p>
+                        {author.role && <p className="text-xs text-slate-500">{author.role}</p>}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <p className="font-medium text-sm text-navy-900">{article.author.name}</p>
-                {article.author.role && <p className="text-xs text-slate-500 mt-0.5">{article.author.role}</p>}
               </div>
             )}
 

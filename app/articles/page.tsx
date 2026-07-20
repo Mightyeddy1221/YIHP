@@ -102,7 +102,9 @@ export default async function ArticlesPage() {
                   <p className="mt-2 text-sm text-slate-600 leading-relaxed line-clamp-2">{article.excerpt}</p>
                 )}
                 <div className="mt-3 flex items-center gap-4">
-                  {article.author && <span className="text-xs text-slate-500">By {article.author.name}</span>}
+                  {article.authors?.length > 0 && (
+                    <span className="text-xs text-slate-500">By {article.authors.map((a: any) => a.name).join(", ")}</span>
+                  )}
                   <Link href={`/articles/${article.slug.current}`} className="text-xs font-medium text-navy-700 hover:text-gold-500 transition-colors flex items-center gap-1 cursor-pointer">
                     Read article <ArrowRight className="w-3 h-3" />
                   </Link>

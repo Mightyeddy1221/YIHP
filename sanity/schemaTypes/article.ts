@@ -23,7 +23,7 @@ export default defineType({
       type: "url",
       description: "Paste a link to the Google Doc transcript of the interview/meeting this article is based on. Internal reference only — not shown to site visitors unless wired into the page template.",
     }),
-    defineField({ name: "author", title: "Author", type: "reference", to: [{ type: "teamMember" }] }),
+    defineField({ name: "authors", title: "Authors", type: "array", of: [{ type: "reference", to: [{ type: "teamMember" }] }] }),
     defineField({ name: "date", title: "Publication Date", type: "date", initialValue: () => new Date().toISOString().split("T")[0] }),
     defineField({ name: "desk", title: "Policy Desk", type: "reference", to: [{ type: "policyDesk" }] }),
     defineField({ name: "topics", title: "Topics", type: "array", of: [{ type: "reference", to: [{ type: "topicArea" }] }] }),
