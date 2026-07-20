@@ -8,6 +8,8 @@ import { PortableText } from "@portabletext/react";
 import { notFound } from "next/navigation";
 import JsonLd from "@/components/JsonLd";
 import VideoPlayer from "@/components/VideoPlayer";
+import SectionNav from "@/components/SectionNav";
+import { proseComponents, extractHeadings, type Heading } from "@/components/prose";
 import { SITE_URL, SITE_DESCRIPTION, ogImageUrl } from "@/lib/seo";
 
 export const revalidate = 60;
@@ -63,6 +65,9 @@ export default async function ArticlePage({ params }: { params: { slug: string }
   const url = `${SITE_URL}/articles/${params.slug}`;
   const ogImage = ogImageFor(article);
 
+  // Sections nav: headings pulled straight from the article body.
+  const sections: Heading[] = extractHeadings(article.body);
+
   const articleLd = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -93,14 +98,27 @@ export default async function ArticlePage({ params }: { params: { slug: string }
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div className="max-w-[84rem] mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <JsonLd data={[articleLd, breadcrumbLd]} />
-      <div className="lg:grid lg:grid-cols-[1fr_300px] lg:gap-12">
-        <article>
-          <Link href="/articles" className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-navy-800 transition-colors mb-8 cursor-pointer">
-            <ArrowLeft className="w-4 h-4" /> Back to Articles
-          </Link>
 
+      {/* mobile back link */}
+      <Link href="/articles" className="lg:hidden inline-flex items-center gap-2 text-sm text-slate-500 hover:text-navy-800 transition-colors mb-8 cursor-pointer">
+        <ArrowLeft className="w-4 h-4" /> Back to Articles
+      </Link>
+
+      <div className="grid grid-cols-1 lg:grid-cols-[13rem_minmax(0,44rem)_15rem] lg:justify-between gap-x-10 gap-y-10">
+        {/* ===== LEFT RAIL — sticky sections nav ===== */}
+        <div className="hidden lg:block">
+          <div className="lg:sticky lg:top-28">
+            <Link href="/articles" className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-navy-800 transition-colors mb-8 cursor-pointer">
+              <ArrowLeft className="w-4 h-4" /> Back
+            </Link>
+            <SectionNav sections={sections} />
+          </div>
+        </div>
+
+        {/* ===== MIDDLE — article ===== */}
+        <article className="min-w-0">
           {article.videoUrl && (
             <div className="mb-8">
               <VideoPlayer url={article.videoUrl} title={article.title} />
@@ -150,40 +168,43 @@ export default async function ArticlePage({ params }: { params: { slug: string }
           </div>
 
           {article.body && (
-            <div className="mt-8 prose prose-slate max-w-none prose-headings:font-serif prose-headings:text-navy-900 prose-a:text-navy-700 [&_*]:break-words [&_*]:overflow-wrap-anywhere">
-              <PortableText value={article.body} />
+            <div className="mt-8 prose prose-slate max-w-none prose-lg prose-headings:font-serif prose-headings:text-navy-900 prose-a:text-navy-700 [&_*]:break-words [&_*]:overflow-wrap-anywhere">
+              <PortableText value={article.body} components={proseComponents} />
             </div>
           )}
         </article>
 
-        <aside className="mt-12 lg:mt-0 space-y-6">
-          {article.author && (
-            <div className="border border-slate-200 p-5">
-              <h3 className="font-serif text-sm font-semibold text-navy-900 mb-3">About the Author</h3>
-              <div className="w-10 h-10 rounded-full bg-navy-100 flex items-center justify-center mb-3">
-                <span className="font-serif text-navy-800 font-bold text-sm">{article.author.name?.[0]}</span>
+        {/* ===== RIGHT RAIL — author + related ===== */}
+        <aside>
+          <div className="lg:sticky lg:top-28 space-y-6">
+            {article.author && (
+              <div className="border border-slate-200 p-5">
+                <h3 className="font-serif text-sm font-semibold text-navy-900 mb-3">About the Author</h3>
+                <div className="w-10 h-10 rounded-full bg-navy-100 flex items-center justify-center mb-3">
+                  <span className="font-serif text-navy-800 font-bold text-sm">{article.author.name?.[0]}</span>
+                </div>
+                <p className="font-medium text-sm text-navy-900">{article.author.name}</p>
+                {article.author.role && <p className="text-xs text-slate-500 mt-0.5">{article.author.role}</p>}
               </div>
-              <p className="font-medium text-sm text-navy-900">{article.author.name}</p>
-              {article.author.role && <p className="text-xs text-slate-500 mt-0.5">{article.author.role}</p>}
-            </div>
-          )}
+            )}
 
-          <div className="border border-slate-200 p-5">
-            <h3 className="font-serif text-sm font-semibold text-navy-900 mb-3">Related</h3>
-            <div className="space-y-3">
-              {article.topics?.[0] && (
-                <Link href={`/topic/${article.topics[0].slug.current}`} className="block text-sm text-navy-700 hover:text-gold-500 transition-colors cursor-pointer">
-                  More on {article.topics[0].title} →
+            <div className="border border-slate-200 p-5">
+              <h3 className="font-serif text-sm font-semibold text-navy-900 mb-3">Related</h3>
+              <div className="space-y-3">
+                {article.topics?.[0] && (
+                  <Link href={`/topic/${article.topics[0].slug.current}`} className="block text-sm text-navy-700 hover:text-gold-500 transition-colors cursor-pointer">
+                    More on {article.topics[0].title} →
+                  </Link>
+                )}
+                {article.desk && (
+                  <Link href={`/desk/${article.desk.slug.current}`} className="block text-sm text-navy-700 hover:text-gold-500 transition-colors cursor-pointer">
+                    {article.desk.title} Desk →
+                  </Link>
+                )}
+                <Link href="/policy-memos" className="block text-sm text-navy-700 hover:text-gold-500 transition-colors cursor-pointer">
+                  Policy Memos →
                 </Link>
-              )}
-              {article.desk && (
-                <Link href={`/desk/${article.desk.slug.current}`} className="block text-sm text-navy-700 hover:text-gold-500 transition-colors cursor-pointer">
-                  {article.desk.title} Desk →
-                </Link>
-              )}
-              <Link href="/policy-memos" className="block text-sm text-navy-700 hover:text-gold-500 transition-colors cursor-pointer">
-                Policy Memos →
-              </Link>
+              </div>
             </div>
           </div>
         </aside>
