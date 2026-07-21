@@ -6,6 +6,7 @@ import { singleMemoQuery } from "@/sanity/lib/queries";
 import { PortableText } from "@portabletext/react";
 import { notFound } from "next/navigation";
 import JsonLd from "@/components/JsonLd";
+import AuthorName, { AuthorNames } from "@/components/AuthorName";
 import VideoPlayer from "@/components/VideoPlayer";
 import SectionNav from "@/components/SectionNav";
 import { proseComponents, extractHeadings, type Heading } from "@/components/prose";
@@ -163,7 +164,7 @@ export default async function MemoPage({ params }: { params: { slug: string } })
             {memo.date && <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> {formatDate(memo.date)}</span>}
             {memo.authors?.length > 0 && (
               <span className="flex items-center gap-1.5">
-                <Users className="w-3.5 h-3.5" /> {memo.authors.map((a: any) => a.name).join(", ")}
+                <Users className="w-3.5 h-3.5" /> <AuthorNames authors={memo.authors} />
               </span>
             )}
           </div>
@@ -223,7 +224,7 @@ export default async function MemoPage({ params }: { params: { slug: string } })
                         <span className="font-serif text-navy-800 font-bold text-xs">{author.name?.[0]}</span>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-navy-900">{author.name}</p>
+                        <p className="text-sm font-medium text-navy-900"><AuthorName author={author} /></p>
                         {author.role && <p className="text-xs text-slate-500">{author.role}</p>}
                       </div>
                     </div>

@@ -3,6 +3,7 @@ import { FileText, ArrowRight, Download } from "lucide-react";
 import type { Metadata } from "next";
 import { client } from "@/sanity/lib/client";
 import { allMemosQuery, allTopicsQuery } from "@/sanity/lib/queries";
+import { AuthorNames } from "@/components/AuthorName";
 import { SITE_URL, ogImageUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -91,7 +92,7 @@ export default async function PolicyMemosPage() {
                     </h2>
                   </Link>
                   {memo.authors?.length > 0 && (
-                    <p className="text-xs text-slate-500 mt-2">By {memo.authors.map((a: any) => a.name).join(", ")}</p>
+                    <p className="text-xs text-slate-500 mt-2">By <AuthorNames authors={memo.authors} /></p>
                   )}
                   {memo.tags?.length > 0 && (
                     <div className="mt-3 flex flex-wrap gap-1.5">

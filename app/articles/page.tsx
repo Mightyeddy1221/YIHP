@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, BookOpen } from "lucide-react";
 import InlineVideo from "@/components/InlineVideo";
+import { AuthorNames } from "@/components/AuthorName";
 import type { Metadata } from "next";
 import { client } from "@/sanity/lib/client";
 import { recentArticlesQuery, allTopicsQuery, allDesksQuery } from "@/sanity/lib/queries";
@@ -103,7 +104,7 @@ export default async function ArticlesPage() {
                 )}
                 <div className="mt-3 flex items-center gap-4">
                   {article.authors?.length > 0 && (
-                    <span className="text-xs text-slate-500">By {article.authors.map((a: any) => a.name).join(", ")}</span>
+                    <span className="text-xs text-slate-500">By <AuthorNames authors={article.authors} /></span>
                   )}
                   <Link href={`/articles/${article.slug.current}`} className="text-xs font-medium text-navy-700 hover:text-gold-500 transition-colors flex items-center gap-1 cursor-pointer">
                     Read article <ArrowRight className="w-3 h-3" />

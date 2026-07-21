@@ -7,6 +7,7 @@ import { urlFor } from "@/sanity/lib/image";
 import { PortableText } from "@portabletext/react";
 import { notFound } from "next/navigation";
 import JsonLd from "@/components/JsonLd";
+import AuthorName, { AuthorNames } from "@/components/AuthorName";
 import VideoPlayer from "@/components/VideoPlayer";
 import SectionNav from "@/components/SectionNav";
 import { proseComponents, extractHeadings, type Heading } from "@/components/prose";
@@ -154,7 +155,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
           <div className="mt-6 flex flex-wrap gap-4 text-sm text-slate-500 pb-6 border-b border-slate-200">
             {article.authors?.length > 0 && (
               <span className="flex items-center gap-1.5">
-                <User className="w-3.5 h-3.5" /> {article.authors.map((a: any) => a.name).join(", ")}
+                <User className="w-3.5 h-3.5" /> <AuthorNames authors={article.authors} />
               </span>
             )}
             {article.date && <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> {formatDate(article.date)}</span>}
@@ -193,7 +194,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
                         <span className="font-serif text-navy-800 font-bold text-xs">{author.name?.[0]}</span>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-navy-900">{author.name}</p>
+                        <p className="text-sm font-medium text-navy-900"><AuthorName author={author} /></p>
                         {author.role && <p className="text-xs text-slate-500">{author.role}</p>}
                       </div>
                     </div>

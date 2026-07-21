@@ -3,7 +3,7 @@ import { groq } from "next-sanity";
 export const articleFields = groq`
   _id, title, slug, excerpt, date, featured, videoUrl,
   heroImage { asset->, alt },
-  authors[]->{ name, role, photo { asset-> } },
+  authors[]->{ name, role, slug, photo { asset-> } },
   desk->{ title, slug },
   topics[]->{ title, slug }
 `;
@@ -12,7 +12,7 @@ export const memoFields = groq`
   _id, title, slug, date, tags,
   desk->{ title, slug },
   topics[]->{ title, slug },
-  authors[]->{ name, role },
+  authors[]->{ name, role, slug },
   pdfFile { asset-> }
 `;
 
@@ -54,7 +54,15 @@ export const allDesksQuery = groq`
 
 export const allTeamQuery = groq`
   *[_type == "teamMember"] | order(order asc) {
-    _id, name, role, bio, linkedin, order,
+    _id, name, role, slug, bio, linkedin, order,
+    photo { asset-> },
+    desk->{ title, slug }
+  }
+`;
+
+export const teamMemberBySlugQuery = groq`
+  *[_type == "teamMember" && slug.current == $slug][0] {
+    _id, name, role, slug, bio, fullBio, linkedin,
     photo { asset-> },
     desk->{ title, slug }
   }
@@ -106,7 +114,7 @@ export const singleMemoQuery = groq`
     summary,
     body,
     videoUrl,
-    authors[]->{ name, role, photo { asset-> } },
+    authors[]->{ name, role, slug, photo { asset-> } },
     seo { metaTitle, metaDescription, noindex, ogImage { asset->, alt } }
   }
 `;

@@ -122,7 +122,13 @@ function MemberCard({ member, large }: { member: any; large: boolean }) {
           </div>
         )}
         <div className="pt-1">
-          <h3 className={`font-serif ${large ? "text-2xl" : "text-xl"} font-semibold text-navy-900`}>{member.name}</h3>
+          {member.slug?.current ? (
+            <Link href={`/team/${member.slug.current}`} className={`block font-serif ${large ? "text-2xl" : "text-xl"} font-semibold text-navy-900 hover:text-gold-500 transition-colors cursor-pointer`}>
+              {member.name}
+            </Link>
+          ) : (
+            <h3 className={`font-serif ${large ? "text-2xl" : "text-xl"} font-semibold text-navy-900`}>{member.name}</h3>
+          )}
           {member.role && <p className={`mt-1 ${large ? "text-base text-gold-500 font-medium" : "text-sm text-slate-500"}`}>{member.role}</p>}
           {member.desk && (
             <Link href={`/desk/${member.desk.slug.current}`} className="block mt-1 text-sm text-slate-500 hover:text-navy-700 transition-colors cursor-pointer">
